@@ -7,6 +7,10 @@ function [ test_error ] = find_test_error( w, X, y )
 %   should be added. The labels are assumed to be plus or minus one. 
 %   The function returns the error on the test examples as a fraction. The
 %   hypothesis is assumed to be of the form (sign ( [1 x(n,:)] * w )
-
+[N,m] = size(X);
+X = [ones(N,1) X];
+h_val = sign(w*X.');
+diff = 0.5*abs(h_val - y.');
+test_error = sum(diff)/N;
 end
 
