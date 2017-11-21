@@ -9,5 +9,28 @@ function [ oobErr ] = BaggedTrees( X, Y, numBags )
 %
 %   You may use "fitctree" but do not use "TreeBagger" or any other inbuilt
 %   bagging function
-
+[n,m] = size(X);
+trainingData = [X Y];
+sampleInd = zeros(numBags, n);
+trees = {};
+for i=1:numBags
+%     sampleData = datasample(trainingData, n);
+    sampleInd(i,:) = datasample((1:n), n);
+    sampleData = trainingData(sampleInd(i,:), :);
+    trees{end + 1} = fitctree(sampleData(:, 1:m), sampleData(:,m+1));     
+end
+err = zeros(1,n);
+for i=1:n
+    res = [];
+    for j=1:numBags
+        if ~ismember(i, sampleInd(j,:))
+            res = [res predict(trees{j}, X(i,:))];
+        end
+    end
+    finalPredict = mode(res);
+    if finalPredict ~= trainingData(i,end)
+        err(i) = 1;
+    end
+end
+oobErr = sum(err)/n;
 end
